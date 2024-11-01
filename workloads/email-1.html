@@ -7,15 +7,16 @@
     <title>Artifact Viewer</title>
   </head>
   <body>
-    <div id="root">
-      <!-- workload listing -->
-<ul>
-<li><a href="workloads/email-1/">email-1</a></li>
-<li><a href="workloads/login-form/">login-form</a></li>
-<li><a href="workloads/simple-spreadsheet/">simple-spreadsheet</a></li>
+    <div id="root"></div>
+    <script type="module">
+      import React from "react";
+      import ReactDOM from "react-dom/client";
+      import "../src/index.css";
+      import Artifact from '../src/artifacts/email-1'
 
-</ul>
-<!-- end workload listing -->
-    </div>
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        React.createElement(React.StrictMode, null, React.createElement(Artifact, null)),
+      );
+    </script>
   </body>
 </html>

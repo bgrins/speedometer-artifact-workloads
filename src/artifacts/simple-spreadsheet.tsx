@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings2, Plus, Minus, RefreshCw } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { 
+  Settings2, Plus, Minus, RefreshCw, Bold, Italic, Underline, 
+  AlignLeft, AlignCenter, AlignRight, List, ChevronDown,
+  FileText, Download, Share2, Palette, CircleDollarSign, BarChart,
+  Filter, Image, Link, Lock
+} from 'lucide-react';
 
 const SpreadsheetApp = () => {
   const [rows, setRows] = useState(8);
@@ -10,8 +15,9 @@ const SpreadsheetApp = () => {
   const [data, setData] = useState({});
   const [selectedCell, setSelectedCell] = useState(null);
   const [formula, setFormula] = useState('');
+  const [activeSheet, setActiveSheet] = useState('Sheet1');
 
-  // Initialize empty data
+  // ... (keeping existing data management functions)
   useEffect(() => {
     const newData = {};
     for (let i = 0; i < rows; i++) {
@@ -22,10 +28,7 @@ const SpreadsheetApp = () => {
     setData(newData);
   }, [rows, cols]);
 
-  // Convert column number to letter (0 = A, 1 = B, etc.)
   const colToLetter = (col) => String.fromCharCode(65 + col);
-
-  // Convert cell reference (e.g., "A1") to row-col index
   const cellRefToIndex = (ref) => {
     const col = ref.match(/[A-Z]+/)[0];
     const row = parseInt(ref.match(/\d+/)[0]) - 1;
@@ -35,23 +38,15 @@ const SpreadsheetApp = () => {
     };
   };
 
-  // Simple formula evaluator
   const evaluateFormula = (formula) => {
     if (!formula.startsWith('=')) return formula;
-    
     try {
-      // Remove the '=' sign
       let expression = formula.substring(1);
-      
-      // Replace cell references with their values
       expression = expression.replace(/[A-Z]+\d+/g, (cellRef) => {
         const { row, col } = cellRefToIndex(cellRef);
         const value = data[`${row}-${col}`] || '0';
         return isNaN(value) ? '0' : value;
       });
-      
-      // Evaluate basic arithmetic
-      // eslint-disable-next-line no-new-func
       return Function(`return ${expression}`)();
     } catch (error) {
       return '#ERROR';
@@ -77,49 +72,81 @@ const SpreadsheetApp = () => {
     }
   };
 
-  const addRow = () => setRows(prev => prev + 1);
-  const removeRow = () => setRows(prev => Math.max(1, prev - 1));
-  const addColumn = () => setCols(prev => prev + 1);
-  const removeColumn = () => setCols(prev => Math.max(1, prev - 1));
-
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="border-b">
-        <div className="flex items-center justify-between">
-          <CardTitle>Simple Spreadsheet</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="icon" onClick={addRow}><Plus className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={removeRow}><Minus className="h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={addColumn}><Plus className="rotate-90 h-4 w-4" /></Button>
-            <Button variant="outline" size="icon" onClick={removeColumn}><Minus className="rotate-90 h-4 w-4" /></Button>
-            <Button variant="outline" size="icon"><Settings2 className="h-4 w-4" /></Button>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Top Menu Bar */}
+      <div className="bg-white border-b px-4 py-1">
+        <div className="flex items-center space-x-4">
+          <FileText className="h-5 w-5 text-gray-600" />
+          <div className="flex flex-col">
+            <input 
+              defaultValue="Untitled spreadsheet" 
+              className="font-medium outline-none border-b border-transparent hover:border-gray-300 px-1"
+            />
+            <div className="flex space-x-4 text-sm text-gray-600">
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">File</button>
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">Edit</button>
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">View</button>
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">Insert</button>
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">Format</button>
+              <button className="hover:bg-gray-100 px-2 py-1 rounded">Tools</button>
+            </div>
+          </div>
+          <div className="ml-auto flex items-center space-x-2">
+            <Button variant="outline" size="sm"><Share2 className="h-4 w-4 mr-1" /> Share</Button>
           </div>
         </div>
-        {selectedCell && (
-          <div className="flex items-center space-x-2 mt-4">
-            <span className="text-sm font-medium">
-              {colToLetter(parseInt(selectedCell.split('-')[1]))}{parseInt(selectedCell.split('-')[0]) + 1}:
-            </span>
-            <Input 
-              value={formula}
-              onChange={handleFormulaChange}
-              placeholder="Enter value or formula (e.g., =A1+B1)"
-              className="flex-1"
-            />
-            <Button variant="outline" size="icon">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="overflow-auto max-h-[600px]">
+      </div>
+
+      {/* Toolbar */}
+      <div className="bg-white border-b px-4 py-1 flex items-center space-x-2">
+        <Button variant="ghost" size="icon"><RefreshCw className="h-4 w-4" /></Button>
+        <div className="h-4 border-r border-gray-300" />
+        <select className="border rounded px-2 py-1 text-sm">
+          <option>Arial</option>
+          <option>Times New Roman</option>
+        </select>
+        <select className="border rounded px-2 py-1 text-sm w-16">
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+        </select>
+        <div className="h-4 border-r border-gray-300" />
+        <Button variant="ghost" size="icon"><Bold className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><Italic className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><Underline className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><Palette className="h-4 w-4" /></Button>
+        <div className="h-4 border-r border-gray-300" />
+        <Button variant="ghost" size="icon"><AlignLeft className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><AlignCenter className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><AlignRight className="h-4 w-4" /></Button>
+        <div className="h-4 border-r border-gray-300" />
+        <Button variant="ghost" size="icon"><List className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><CircleDollarSign className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><BarChart className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon"><Filter className="h-4 w-4" /></Button>
+      </div>
+
+      {/* Formula Bar */}
+      <div className="bg-white border-b px-4 py-1 flex items-center space-x-2">
+        <div className="w-10 text-center text-gray-600">fx</div>
+        <Input 
+          value={formula}
+          onChange={handleFormulaChange}
+          placeholder="Enter value or formula (e.g., =A1+B1)"
+          className="flex-1"
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <div className="overflow-auto h-full">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="w-12 bg-gray-50 p-2 border"></th>
+                <th className="w-12 bg-gray-50 p-2 border sticky top-0 z-10"></th>
                 {[...Array(cols)].map((_, i) => (
-                  <th key={i} className="text-center bg-gray-50 p-2 border font-medium">
+                  <th key={i} className="text-center bg-gray-50 p-2 border font-medium sticky top-0 z-10">
                     {colToLetter(i)}
                   </th>
                 ))}
@@ -128,7 +155,7 @@ const SpreadsheetApp = () => {
             <tbody>
               {[...Array(rows)].map((_, row) => (
                 <tr key={row}>
-                  <td className="text-center bg-gray-50 p-2 border font-medium">{row + 1}</td>
+                  <td className="text-center bg-gray-50 p-2 border font-medium sticky left-0">{row + 1}</td>
                   {[...Array(cols)].map((_, col) => (
                     <td 
                       key={col}
@@ -149,8 +176,26 @@ const SpreadsheetApp = () => {
             </tbody>
           </table>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Bottom Sheet Tabs */}
+      <div className="bg-white border-t px-4 py-1 flex items-center space-x-2">
+        <div className="flex space-x-1">
+          {['Sheet1', 'Sheet2', 'Sheet3'].map(sheet => (
+            <button
+              key={sheet}
+              onClick={() => setActiveSheet(sheet)}
+              className={`px-4 py-1 text-sm rounded-t border-t border-l border-r ${
+                activeSheet === sheet ? 'bg-white border-gray-300' : 'bg-gray-100 border-transparent'
+              }`}
+            >
+              {sheet}
+            </button>
+          ))}
+          <Button variant="ghost" size="icon"><Plus className="h-4 w-4" /></Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
