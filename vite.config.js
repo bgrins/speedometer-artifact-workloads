@@ -34,6 +34,8 @@ function createHTMLFilesForArtifacts() {
 		}
 	}
 
+	const staticPages = fs.readdirSync(resolve(__dirname, 'workloads/static'));
+
 	// Update index.html with a listing
 	const html = fs.readFileSync(resolve(__dirname, 'index.html'), 'utf-8');
 	const ulStart = html.indexOf('<!-- workload listing -->');
@@ -43,10 +45,14 @@ function createHTMLFilesForArtifacts() {
 	for (const component of artifacts) {
 		if (path.extname(component) === '.tsx' || path.extname(component) === '.jsx') {
 			const componentName = path.basename(component, path.extname(component));
-			console.log("Component name", componentName)
 			newUl += `<li><a href="workloads/${componentName}/">${componentName}</a></li>
 `;
 		}
+	}
+	for (const page of staticPages) {
+		const pageName = page.replace('.html', '');
+		newUl += `<li><a href="workloads/static/${pageName}/">${pageName}</a></li>
+`;
 	}
 	newUl += "\n</ul>\n";
 	const newHTML = html.replace(ul, newUl);
@@ -61,7 +67,6 @@ function getHtmlInputs() {
 	const pages = fs.readdirSync(pagesDir);
 
 	return pages.reduce((inputs, page) => {
-		console.log(page)
 		if (path.extname(page) === '.html') {
 			const pageName = page.replace('.html', '');
 			inputs[pageName] = resolve(pagesDir, page);
@@ -69,8 +74,6 @@ function getHtmlInputs() {
 		return inputs;
 	}, {});
 }
-
-console.log("Html inputs", getHtmlInputs())
 
 export default defineConfig({
 	plugins: [react(),

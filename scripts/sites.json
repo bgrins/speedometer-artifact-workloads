@@ -1,0 +1,122 @@
+{
+  "Social Media & Communication": [
+    "facebook.com",
+    "twitter.com",
+    "instagram.com",
+    "linkedin.com",
+    "reddit.com",
+    "pinterest.com",
+    "tumblr.com",
+    "discord.com",
+    "telegram.org",
+    "whatsapp.com"
+  ],
+  "Video & Streaming": [
+    "youtube.com",
+    "netflix.com",
+    "twitch.tv",
+    "disneyplus.com",
+    "hulu.com",
+    "vimeo.com",
+    "tiktok.com",
+    "peacocktv.com",
+    "hbomax.com",
+    "paramount.com"
+  ],
+  "E-commerce": [
+    "amazon.com",
+    "ebay.com",
+    "walmart.com",
+    "target.com",
+    "etsy.com",
+    "bestbuy.com",
+    "aliexpress.com",
+    "homedepot.com",
+    "wayfair.com",
+    "costco.com"
+  ],
+  "News & Media": [
+    "cnn.com",
+    "nytimes.com",
+    "theguardian.com",
+    "bbc.com",
+    "reuters.com",
+    "washingtonpost.com",
+    "bloomberg.com",
+    "forbes.com",
+    "huffpost.com",
+    "weather.com"
+  ],
+  "Tech & Reference": [
+    "microsoft.com",
+    "apple.com",
+    "wikipedia.org",
+    "github.com",
+    "stackoverflow.com",
+    "medium.com",
+    "quora.com",
+    "imdb.com",
+    "fandom.com",
+    "webmd.com"
+  ],
+  "Productivity & Cloud": [
+    "office.com",
+    "docs.google.com",
+    "drive.google.com",
+    "dropbox.com",
+    "zoom.us",
+    "calendar.google.com",
+    "notion.so",
+    "trello.com",
+    "slack.com",
+    "sheets.google.com"
+  ],
+  "Gaming & Entertainment": [
+    "steam.community",
+    "roblox.com",
+    "epicgames.com",
+    "xbox.com",
+    "playstation.com",
+    "nintendo.com",
+    "ea.com",
+    "ign.com",
+    "gamespot.com",
+    "chess.com"
+  ],
+  "Travel & Local": [
+    "booking.com",
+    "airbnb.com",
+    "expedia.com",
+    "tripadvisor.com",
+    "maps.google.com",
+    "southwest.com",
+    "united.com",
+    "delta.com",
+    "marriott.com",
+    "hilton.com"
+  ],
+  "Finance & Banking": [
+    "paypal.com",
+    "chase.com",
+    "wellsfargo.com",
+    "bankofamerica.com",
+    "coinbase.com",
+    "robinhood.com",
+    "mint.com",
+    "capitalone.com",
+    "nasdaq.com",
+    "marketwatch.com"
+  ],
+  "Education & Learning": [
+    "canvas.instructure.com",
+    "coursera.org",
+    "udemy.com",
+    "duolingo.com",
+    "kahoot.it",
+    "blackboard.com",
+    "edx.org",
+    "khanacademy.org",
+    "chegg.com",
+    "brainly.com"
+  ]
+}
