@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -12,7 +12,6 @@ class SeededRandom {
     this.seed = seed;
   }
 
-  // Linear Congruential Generator
   random() {
     this.seed = (1664525 * this.seed + 1013904223) % 4294967296;
     return this.seed / 4294967296;
@@ -30,28 +29,36 @@ const SystemDashboard = () => {
     }));
   };
 
-  const generateMetricData = () => ({
+  const metrics = {
     cpu: generateTimeSeriesData(100, 45, 30),
     memory: generateTimeSeriesData(100, 75, 15),
     network: generateTimeSeriesData(100, 60, 25),
     disk: generateTimeSeriesData(100, 50, 20),
     errorRate: generateTimeSeriesData(100, 2, 3),
     responseTime: generateTimeSeriesData(100, 250, 150),
-  });
+  };
 
-  const [metrics, setMetrics] = useState(generateMetricData());
-  const [activeIncidents, setActiveIncidents] = useState(2);
-  const [systemHealth, setSystemHealth] = useState(94);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [completedCharts, setCompletedCharts] = useState(0);
+  const totalCharts = 7; // Total number of charts in the dashboard
 
-  // Simulate real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMetrics(generateMetricData());
-      setSystemHealth(Math.min(100, Math.max(0, systemHealth + (seededRandom.random() - 0.5) * 2)));
-      setActiveIncidents(Math.max(0, activeIncidents + (seededRandom.random() < 0.3 ? 1 : -1)));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [systemHealth, activeIncidents]);
+  const handleChartAnimationEnd = () => {
+    const newCompleted = completedCharts + 1;
+    setCompletedCharts(newCompleted);
+    if (newCompleted === totalCharts) {
+      setAnimationComplete(true);
+      console.log('All chart animations completed');
+    }
+  };
+
+  // Set this to false to disable all animations
+  const ENABLE_ANIMATIONS = true;
+
+  const commonChartProps = {
+    isAnimationActive: ENABLE_ANIMATIONS,
+    animationDuration: 1000,
+    onAnimationEnd: handleChartAnimationEnd,
+  };
 
   const SimpleOverview = () => (
     <div className="grid gap-4">
@@ -63,33 +70,27 @@ const SystemDashboard = () => {
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {systemHealth > 90 ? (
-                <CheckCircle2 className="w-8 h-8 text-green-500" />
-              ) : (
-                <AlertCircle className="w-8 h-8 text-yellow-500" />
-              )}
+              <CheckCircle2 className="w-8 h-8 text-green-500" />
               <div>
-                <div className="text-2xl font-bold">{systemHealth.toFixed(1)}%</div>
+                <div className="text-2xl font-bold">94.5%</div>
                 <div className="text-sm text-gray-500">Overall Health</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold">{activeIncidents}</div>
+              <div className="text-xl font-bold">2</div>
               <div className="text-sm text-gray-500">Active Incidents</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {activeIncidents > 0 && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Active Incidents Detected</AlertTitle>
-          <AlertDescription>
-            There are currently {activeIncidents} active incidents requiring attention.
-          </AlertDescription>
-        </Alert>
-      )}
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Active Incidents Detected</AlertTitle>
+        <AlertDescription>
+          There are currently 2 active incidents requiring attention.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 
@@ -112,7 +113,13 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" name="CPU %" />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#8884d8" 
+                  name="CPU %"
+                  {...commonChartProps}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -136,7 +143,14 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Area type="monotone" dataKey="value" stroke="#82ca9d" fill="#82ca9d" name="Memory %" />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#82ca9d" 
+                  fill="#82ca9d" 
+                  name="Memory %"
+                  {...commonChartProps}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -160,7 +174,12 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="value" fill="#8884d8" name="Network Usage %" />
+                <Bar 
+                  dataKey="value" 
+                  fill="#8884d8" 
+                  name="Network Usage %"
+                  {...commonChartProps}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -184,7 +203,13 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="value" stroke="#ffc658" name="Disk Usage %" />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#ffc658" 
+                  name="Disk Usage %"
+                  {...commonChartProps}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -208,7 +233,13 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="value" stroke="#ff7300" name="Errors/min" />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#ff7300" 
+                  name="Errors/min"
+                  {...commonChartProps}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -232,7 +263,13 @@ const SystemDashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="value" stroke="#413ea0" name="Response Time (ms)" />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#413ea0" 
+                  name="Response Time (ms)"
+                  {...commonChartProps}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -264,6 +301,7 @@ const SystemDashboard = () => {
                   fill="#8884d8"
                   dataKey="value"
                   label
+                  {...commonChartProps}
                 >
                 </Pie>
                 <Tooltip />
