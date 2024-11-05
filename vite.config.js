@@ -109,9 +109,6 @@ export default defineConfig({
 			output: {
         assetFileNames: '[name]/[name].[ext]',
 				manualChunks(id) {
-					// if (id.includes("node_modules/react")) {
-					// 	return "react";
-					// }
 					if (id.includes('node_modules')) {
 						return 'vendor';
 					}
