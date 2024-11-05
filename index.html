@@ -11,6 +11,7 @@
       <!-- workload listing -->
 <ul>
 <li><a href="workloads/data-dashboard-1/">data-dashboard-1</a></li>
+<li><a href="workloads/edu-1/">edu-1</a></li>
 <li><a href="workloads/email-1/">email-1</a></li>
 <li><a href="workloads/login-form/">login-form</a></li>
 <li><a href="workloads/pinterest-inspired/">pinterest-inspired</a></li>
@@ -21,5 +22,15 @@
 </ul>
 <!-- end workload listing -->
     </div>
+
+  <script type="module">
+    if (import.meta.env.DEV) {
+      document.querySelectorAll("ul a").forEach((a) => {
+        if (a.href.endsWith("/")) {
+          a.href = a.href.slice(0, -1);
+        }
+      });
+    }
+  </script>
   </body>
 </html>
