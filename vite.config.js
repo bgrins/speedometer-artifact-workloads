@@ -34,7 +34,7 @@ function createHTMLFilesForArtifacts() {
 		}
 	}
 
-	const staticPages = fs.readdirSync(resolve(__dirname, 'workloads/static'));
+	const staticPages = fs.readdirSync(resolve(__dirname, 'public/workloads'));
 
 	// Update index.html with a listing
 	const html = fs.readFileSync(resolve(__dirname, 'index.html'), 'utf-8');
@@ -50,8 +50,7 @@ function createHTMLFilesForArtifacts() {
 		}
 	}
 	for (const page of staticPages) {
-		const pageName = page.replace('.html', '');
-		newUl += `<li><a href="workloads/static/${pageName}/">${pageName}</a></li>
+		newUl += `<li><a href="workloads/${page}">${page}</a></li>
 `;
 	}
 	newUl += "\n</ul>\n";
