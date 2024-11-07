@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Touch Debugger</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      background: white;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .debug-area {
+      position: relative;
+      flex-grow: 1;
+      background: #f3f4f6;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 1.125rem;
+    }
+
+    .touch-point {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .touch-outer {
+      position: absolute;
+      inset: 0;
+      border: 4px solid;
+      border-radius: 50%;
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .touch-inner {
+      position: absolute;
+      inset: 16px;
+      border-radius: 50%;
+    }
+
+    .touch-data {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: monospace;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      pointer-events: none;
+      white-space: pre;
+    }
+
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="info-card">
+      <h1 class="title">Multi-touch Debug Visualizer</h1>
+      <p class="subtitle">Touch the screen to see touch points and their properties. Active touches: <span id="touch-count">0</span> | Last event: <span id="last-event">None</span></p>
+    </div>
+    
+    <div id="debug-area" class="debug-area">
+      <div class="empty-state">Touch anywhere to begin debugging</div>
+    </div>
+  </div>
+
+  <script>
+    const debugArea = document.getElementById('debug-area');
+    const touchCount = document.getElementById('touch-count');
+    const lastEvent = document.getElementById('last-event');
+    const touchPoints = new Map();
+    
+    const colors = ['#FF0000', '#0000FF', '#00FF00', '#800080', '#FFA500'];
+    const getColor = (index) => colors[index % colors.length];
+    
+    // Prevent default touch behaviors
+    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    
+    function createTouchPoint(touch, color) {
+      const point = document.createElement('div');
+      point.className = 'touch-point';
+      
+      const outer = document.createElement('div');
+      outer.className = 'touch-outer';
+      outer.style.borderColor = color;
+      
+      const inner = document.createElement('div');
+      inner.className = 'touch-inner';
+      inner.style.backgroundColor = color;
+      
+      const data = document.createElement('div');
+      data.className = 'touch-data';
+      data.style.color = color;
+      
+      point.appendChild(outer);
+      point.appendChild(inner);
+      point.appendChild(data);
+      
+      return { element: point, data };
+    }
+    
+    function updateTouchPoint(touch, point) {
+      const rect = debugArea.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      
+      point.element.style.left = `${x}px`;
+      point.element.style.top = `${y}px`;
+      
+      point.data.style.left = `${x + 40}px`;
+      point.data.style.top = `${y + 40}px`;
+      
+      point.data.textContent = 
+        `ID: ${touch.identifier}\n` +
+        `Force: ${touch.force?.toFixed(3) || 'N/A'}\n` +
+        `Radius: ${touch.radiusX?.toFixed(1) || 'N/A'}×${touch.radiusY?.toFixed(1) || 'N/A'}\n` +
+        `Rotation: ${touch.rotationAngle?.toFixed(1) || 'N/A'}°\n` +
+        `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
+    }
+    
+    function processTouch(e, eventType) {
+      e.preventDefault();
+      lastEvent.textContent = eventType;
+      
+      // Remove points that are no longer touched
+      for (const [id, point] of touchPoints) {
+        if (![...e.touches].some(touch => touch.identifier === id)) {
+          point.element.remove();
+          touchPoints.delete(id);
+        }
+      }
+      
+      // Update or create points for current touches
+      Array.from(e.touches).forEach((touch, index) => {
+        let point = touchPoints.get(touch.identifier);
+        
+        if (!point) {
+          point = createTouchPoint(touch, getColor(index));
+          debugArea.appendChild(point.element);
+          touchPoints.set(touch.identifier, point);
+        }
+        
+        updateTouchPoint(touch, point);
+      });
+      
+      touchCount.textContent = touchPoints.size;
+      console.log(`Touch event: ${eventType}`, Array.from(e.touches));
+    }
+    
+    debugArea.addEventListener('touchstart', e => processTouch(e, 'touchstart'), { passive: false });
+    debugArea.addEventListener('touchmove', e => processTouch(e, 'touchmove'), { passive: false });
+    debugArea.addEventListener('touchend', e => processTouch(e, 'touchend'), { passive: false });
+    debugArea.addEventListener('touchcancel', e => processTouch(e, 'touchcancel'), { passive: false });
+  </script>
+</body>
+</html>
