@@ -5,43 +5,133 @@
     <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBNYWNpbnRvc2ggSEQgdjEuOTAg4Baq2gAAAD9JREFUKFNjZGBgYGBgUggUGBoa/N8BgwERnLx9uZkBlJDAyMjKAkYEHETVzkKACGcEAMON0IxtZG6XAAAAAElFTkSuQmCC" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Artifact Viewer</title>
+    <style>
+      body { margin: 0; padding: 0; font-family: system-ui; }
+      .container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        height: 100vh;
+      }
+      .sidebar {
+        padding: 1rem;
+        border-right: 1px solid #ccc;
+        overflow-y: auto;
+      }
+      .preview {
+        height: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      .workload-item {
+        padding: 8px;
+        margin: 4px 0;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .workload-item.active {
+        background: #e0e0e0;
+      }
+      .run-tests {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <div id="root">
-      <!-- workload listing -->
-<ul>
-<li><a href="workloads/data-dashboard-1/">data-dashboard-1</a></li>
-<li><a href="workloads/edu-1/">edu-1</a></li>
-<li><a href="workloads/edu-2/">edu-2</a></li>
-<li><a href="workloads/email-1/">email-1</a></li>
-<li><a href="workloads/finance-1/">finance-1</a></li>
-<li><a href="workloads/finance-2/">finance-2</a></li>
-<li><a href="workloads/finance-3/">finance-3</a></li>
-<li><a href="workloads/items-1.html">items-1</a></li>
-<li><a href="workloads/items-2.html">items-2</a></li>
-<li><a href="workloads/linkedin-1.html">linkedin-1</a></li>
-<li><a href="workloads/login-form/">login-form</a></li>
-<li><a href="workloads/multi-touch-1.html">multi-touch-1</a></li>
-<li><a href="workloads/multi-touch-2/">multi-touch-2</a></li>
-<li><a href="workloads/pinterest-inspired/">pinterest-inspired</a></li>
-<li><a href="workloads/project-management-1/">project-management-1</a></li>
-<li><a href="workloads/search-1/">search-1</a></li>
-<li><a href="workloads/simple-spreadsheet/">simple-spreadsheet</a></li>
-<li><a href="workloads/video-1.html">video-1</a></li>
-<li><a href="workloads/video-2/">video-2</a></li>
-
-</ul>
-<!-- end workload listing -->
+    <div class="container">
+      <div class="sidebar">
+        <button class="run-tests">Run Tests</button>
+        <ul id="workload-list" style="list-style: none; padding: 0;">
+          <!-- workload listing -->
+          <li class="workload-item"><a href="workloads/data-dashboard-1/">data-dashboard-1</a></li>
+          <li class="workload-item"><a href="workloads/edu-1/">edu-1</a></li>
+          <li class="workload-item"><a href="workloads/edu-2/">edu-2</a></li>
+          <li class="workload-item"><a href="workloads/email-1/">email-1</a></li>
+          <li class="workload-item"><a href="workloads/finance-1/">finance-1</a></li>
+          <li class="workload-item"><a href="workloads/finance-2/">finance-2</a></li>
+          <li class="workload-item"><a href="workloads/finance-3/">finance-3</a></li>
+          <li class="workload-item"><a href="workloads/items-1.html">items-1</a></li>
+          <li class="workload-item"><a href="workloads/items-2.html">items-2</a></li>
+          <li class="workload-item"><a href="workloads/linkedin-1.html">linkedin-1</a></li>
+          <li class="workload-item"><a href="workloads/login-form/">login-form</a></li>
+          <li class="workload-item"><a href="workloads/multi-touch-1.html">multi-touch-1</a></li>
+          <li class="workload-item"><a href="workloads/multi-touch-2/">multi-touch-2</a></li>
+          <li class="workload-item"><a href="workloads/pinterest-inspired/">pinterest-inspired</a></li>
+          <li class="workload-item"><a href="workloads/project-management-1/">project-management-1</a></li>
+          <li class="workload-item"><a href="workloads/search-1/">search-1</a></li>
+          <li class="workload-item"><a href="workloads/simple-spreadsheet/">simple-spreadsheet</a></li>
+          <li class="workload-item"><a href="workloads/video-1.html">video-1</a></li>
+          <li class="workload-item"><a href="workloads/video-2/">video-2</a></li>
+          <!-- end workload listing -->
+        </ul>
+      </div>
+      <div class="preview">
+        <iframe id="preview-frame"></iframe>
+      </div>
     </div>
 
-  <script type="module">
-    if (import.meta.env.DEV) {
-      document.querySelectorAll("ul a").forEach((a) => {
-        if (a.href.endsWith("/")) {
-          a.href = a.href.slice(0, -1);
-        }
+    <script type="module">
+      const workloadItems = document.querySelectorAll("#workload-list li a");
+      const previewFrame = document.getElementById("preview-frame");
+      const runTestsButton = document.querySelector(".run-tests");
+      let currentTestIndex = -1;
+      let isRunning = false;
+
+      if (import.meta.env.DEV) {
+        workloadItems.forEach((a) => {
+          if (a.href.endsWith("/")) {
+            a.href = a.href.slice(0, -1);
+          }
+        });
+      }
+
+      // Convert links to clickable items
+      workloadItems.forEach((a) => {
+        a.parentElement.classList.add("workload-item");
+        a.parentElement.addEventListener("click", (e) => {
+          e.preventDefault();
+          loadWorkload(a.href);
+          setActiveWorkload(a.parentElement);
+        });
       });
-    }
-  </script>
+
+      function loadWorkload(url) {
+        previewFrame.src = url;
+      }
+
+      function setActiveWorkload(element) {
+        document.querySelectorAll(".workload-item").forEach(item => {
+          item.classList.remove("active");
+        });
+        element?.classList.add("active");
+      }
+
+      async function runTests() {
+        if (isRunning) return;
+        isRunning = true;
+        runTestsButton.textContent = "Running...";
+
+        for (let i = 0; i < workloadItems.length; i++) {
+          currentTestIndex = i;
+          const item = workloadItems[i];
+          loadWorkload(item.href);
+          setActiveWorkload(item.parentElement);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds per test
+        }
+
+        isRunning = false;
+        runTestsButton.textContent = "Run Tests";
+      }
+
+      runTestsButton.addEventListener("click", runTests);
+
+      import remoteWorkloads from "./public/remote-workloads.json" assert { type: "json" };
+      console.log(remoteWorkloads);
+    </script>
   </body>
 </html>
