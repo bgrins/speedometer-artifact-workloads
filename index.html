@@ -1,12 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBNYWNpbnRvc2ggSEQgdjEuOTAg4Baq2gAAAD9JREFUKFNjZGBgYGBgUggUGBoa/N8BgwERnLx9uZkBlJDAyMjKAkYEHETVzkKACGcEAMON0IxtZG6XAAAAAElFTkSuQmCC" type="image/png">
+    <link
+      rel="icon"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBNYWNpbnRvc2ggSEQgdjEuOTAg4Baq2gAAAD9JREFUKFNjZGBgYGBgUggUGBoa/N8BgwERnLx9uZkBlJDAyMjKAkYEHETVzkKACGcEAMON0IxtZG6XAAAAAElFTkSuQmCC"
+      type="image/png"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Artifact Viewer</title>
     <style>
-      body { margin: 0; padding: 0; font-family: system-ui; }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui;
+      }
       .container {
         display: grid;
         grid-template-columns: 300px 1fr;
@@ -46,28 +54,31 @@
     <div class="container">
       <div class="sidebar">
         <button class="run-tests">Run Tests</button>
-        <ul id="workload-list" style="list-style: none; padding: 0;">
+        <ul id="workload-list" style="list-style: none; padding: 0">
           <!-- workload listing -->
-          <li class="workload-item"><a href="workloads/data-dashboard-1/">data-dashboard-1</a></li>
-          <li class="workload-item"><a href="workloads/edu-1/">edu-1</a></li>
-          <li class="workload-item"><a href="workloads/edu-2/">edu-2</a></li>
-          <li class="workload-item"><a href="workloads/email-1/">email-1</a></li>
-          <li class="workload-item"><a href="workloads/finance-1/">finance-1</a></li>
-          <li class="workload-item"><a href="workloads/finance-2/">finance-2</a></li>
-          <li class="workload-item"><a href="workloads/finance-3/">finance-3</a></li>
-          <li class="workload-item"><a href="workloads/items-1.html">items-1</a></li>
-          <li class="workload-item"><a href="workloads/items-2.html">items-2</a></li>
-          <li class="workload-item"><a href="workloads/linkedin-1.html">linkedin-1</a></li>
-          <li class="workload-item"><a href="workloads/login-form/">login-form</a></li>
-          <li class="workload-item"><a href="workloads/multi-touch-1.html">multi-touch-1</a></li>
-          <li class="workload-item"><a href="workloads/multi-touch-2/">multi-touch-2</a></li>
-          <li class="workload-item"><a href="workloads/pinterest-inspired/">pinterest-inspired</a></li>
-          <li class="workload-item"><a href="workloads/project-management-1/">project-management-1</a></li>
-          <li class="workload-item"><a href="workloads/search-1/">search-1</a></li>
-          <li class="workload-item"><a href="workloads/simple-spreadsheet/">simple-spreadsheet</a></li>
-          <li class="workload-item"><a href="workloads/video-1.html">video-1</a></li>
-          <li class="workload-item"><a href="workloads/video-2/">video-2</a></li>
-          <!-- end workload listing -->
+<ul>
+<li><a href="workloads/data-dashboard-1/">data-dashboard-1</a></li>
+<li><a href="workloads/edu-1/">edu-1</a></li>
+<li><a href="workloads/edu-2/">edu-2</a></li>
+<li><a href="workloads/email-1/">email-1</a></li>
+<li><a href="workloads/finance-1/">finance-1</a></li>
+<li><a href="workloads/finance-2/">finance-2</a></li>
+<li><a href="workloads/finance-3/">finance-3</a></li>
+<li><a href="workloads/items-1.html">items-1</a></li>
+<li><a href="workloads/items-2.html">items-2</a></li>
+<li><a href="workloads/linkedin-1.html">linkedin-1</a></li>
+<li><a href="workloads/login-form/">login-form</a></li>
+<li><a href="workloads/multi-touch-1.html">multi-touch-1</a></li>
+<li><a href="workloads/multi-touch-2/">multi-touch-2</a></li>
+<li><a href="workloads/pinterest-inspired/">pinterest-inspired</a></li>
+<li><a href="workloads/project-management-1/">project-management-1</a></li>
+<li><a href="workloads/search-1/">search-1</a></li>
+<li><a href="workloads/simple-spreadsheet/">simple-spreadsheet</a></li>
+<li><a href="workloads/video-1.html">video-1</a></li>
+<li><a href="workloads/video-2/">video-2</a></li>
+
+</ul>
+<!-- end workload listing -->
         </ul>
       </div>
       <div class="preview">
@@ -101,11 +112,33 @@
       });
 
       function loadWorkload(url) {
-        previewFrame.src = url;
+        return new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            console.error("Timeout waiting for workload-loaded event");
+            previewFrame.onload = null;
+            resolve();
+          }, 10000);
+          function onLoad() {
+            clearTimeout(timeout);
+            previewFrame.onload = null;
+            window.addEventListener("message", function onmessage(event) {
+              if (event.data.type === "done") {
+                window.removeEventListener("message", onmessage);
+                console.log("Workload loaded:", url);
+                setTimeout(resolve, 100);
+              }
+            });
+            previewFrame.contentWindow.postMessage(
+              { type: "run" },
+              "*"
+            );
+          };
+          previewFrame.onload = onLoad;
+          previewFrame.src = url;
+        });
       }
-
       function setActiveWorkload(element) {
-        document.querySelectorAll(".workload-item").forEach(item => {
+        document.querySelectorAll(".workload-item").forEach((item) => {
           item.classList.remove("active");
         });
         element?.classList.add("active");
@@ -116,16 +149,20 @@
         isRunning = true;
         runTestsButton.textContent = "Running...";
 
-        for (let i = 0; i < workloadItems.length; i++) {
-          currentTestIndex = i;
-          const item = workloadItems[i];
-          loadWorkload(item.href);
-          setActiveWorkload(item.parentElement);
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds per test
+        try {
+          for (let i = 0; i < workloadItems.length; i++) {
+            currentTestIndex = i;
+            const item = workloadItems[i];
+            let loaded = loadWorkload(item.href);
+            setActiveWorkload(item.parentElement);
+            await loaded;
+          }
+        } catch (error) {
+          console.error("Error running tests:", error);
+        } finally {
+          isRunning = false;
+          runTestsButton.textContent = "Run Tests";
         }
-
-        isRunning = false;
-        runTestsButton.textContent = "Run Tests";
       }
 
       runTestsButton.addEventListener("click", runTests);

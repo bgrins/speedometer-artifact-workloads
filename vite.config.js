@@ -63,6 +63,16 @@ function createHTMLFilesForArtifacts() {
 
   for (const page of staticPages) {
     if (path.extname(page) === ".html") {
+
+			if (!fs.readFileSync(resolve(__dirname, `public/workloads/${page}`), "utf-8").includes("runner-adapter.js")) {
+				const html = fs.readFileSync(resolve(__dirname, `public/workloads/${page}`), "utf-8");
+				const script = `<script type="module" src="../src/runner-adapter.js"></script>`;
+				const newHTML = html.replace("</html>", `${script}
+</html>`);
+				fs.writeFileSync(resolve(__dirname, `public/workloads/${page}`), newHTML);
+			}
+			
+
       const pageName = page.replace(".html", "");
       links.push([pageName, page]);
     }
