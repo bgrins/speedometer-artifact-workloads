@@ -1,7 +1,8 @@
-window.onmessage = function(event) {
+window.onmessage = async function(event) {
   console.log("message posted", event);
   if (event.data.type === 'run') {
     console.log("Request to run");
+    window.parent?.postMessage({ type: 'tests', tests: window.TESTS?.map(test => test.name) }, '*');
 
     if (!window.TESTS) {
       console.error('No tests found on ' + window.location.href);
@@ -13,6 +14,8 @@ window.onmessage = function(event) {
         } catch(e) {
           console.error('Error running test', e);
         }
+        console.log(`Finished test ${test.name}`);
+        window.postMessage({ type: 'test', name: test.name }, '*');
       }
     }
 

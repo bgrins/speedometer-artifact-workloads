@@ -66,7 +66,7 @@
 <li><a href="workloads/finance-3/">finance-3</a></li>
 <li><a href="workloads/items-1.html">items-1</a></li>
 <li><a href="workloads/items-2.html">items-2</a></li>
-<li><a href="workloads/linkedin-1.html">linkedin-1</a></li>
+<li><a href="workloads/linkedin-1/">linkedin-1</a></li>
 <li><a href="workloads/login-form/">login-form</a></li>
 <li><a href="workloads/multi-touch-1.html">multi-touch-1</a></li>
 <li><a href="workloads/multi-touch-2/">multi-touch-2</a></li>
@@ -122,10 +122,14 @@
             clearTimeout(timeout);
             previewFrame.onload = null;
             window.addEventListener("message", function onmessage(event) {
+              if (event.data.type === "tests") {
+                console.log("received tests", event.data.tests)
+              }
+              console.log("received message", event.data);
               if (event.data.type === "done") {
                 window.removeEventListener("message", onmessage);
                 console.log("Workload loaded:", url);
-                setTimeout(resolve, 100);
+                resolve();
               }
             });
             previewFrame.contentWindow.postMessage(
