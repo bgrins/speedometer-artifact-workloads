@@ -1,5 +1,8 @@
 window.onmessage = async function(event) {
   console.log("message posted", event);
+  if (event.data.type === 'metadata') {
+    window.parent?.postMessage({ type: 'tests', tests: window.TESTS?.map(test => test.name) }, '*');
+  }
   if (event.data.type === 'run') {
     console.log("Request to run");
     window.parent?.postMessage({ type: 'tests', tests: window.TESTS?.map(test => test.name) }, '*');

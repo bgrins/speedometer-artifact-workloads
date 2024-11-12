@@ -87,6 +87,8 @@
     </div>
 
     <script type="module">
+      import remoteWorkloads from "./public/remote-workloads.json" assert { type: "json" };
+      console.log(remoteWorkloads);
       const workloadItems = document.querySelectorAll("#workload-list li a");
       const previewFrame = document.getElementById("preview-frame");
       const runTestsButton = document.querySelector(".run-tests");
@@ -171,8 +173,6 @@
 
       runTestsButton.addEventListener("click", runTests);
 
-      import remoteWorkloads from "./public/remote-workloads.json" assert { type: "json" };
-      console.log(remoteWorkloads);
     </script>
   </body>
 </html>
