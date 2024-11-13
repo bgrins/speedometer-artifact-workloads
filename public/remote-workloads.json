@@ -36,10 +36,6 @@
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/items-2.html/"
   },
   {
-    "name": "linkedin-1",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/linkedin-1//"
-  },
-  {
     "name": "login-form",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/login-form//"
   },
@@ -68,6 +64,14 @@
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/simple-spreadsheet//"
   },
   {
+    "name": "social-1",
+    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/social-1//"
+  },
+  {
+    "name": "social-2",
+    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/social-2//"
+  },
+  {
     "name": "video-1",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/video-1.html/"
   },
@@ -78,5 +82,9 @@
   {
     "name": "wiki-1",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/wiki-1//"
+  },
+  {
+    "name": "wiki-2",
+    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/wiki-2.html/"
   }
 ]

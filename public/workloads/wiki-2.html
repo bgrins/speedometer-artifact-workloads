@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album cover - Wikipedia</title>
+    <style>
+        :root {
+            --sidebar-width: 176px;
+            --content-width: 960px;
+            --background-color: #fff;
+            --text-color: #202122;
+            --border-color: #a2a9b1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Liberation Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--background-color);
+        }
+
+        #mw-head {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: calc(100% - var(--sidebar-width));
+            height: 40px;
+            background: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .vector-menu {
+            display: inline-block;
+            padding: 4px 8px;
+        }
+
+        #mw-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        #content {
+            margin-left: var(--sidebar-width);
+            margin-top: 40px;
+            padding: 20px;
+            max-width: var(--content-width);
+        }
+
+        .mw-body {
+            padding: 1em;
+        }
+
+        .toc {
+            border: 1px solid var(--border-color);
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 1em 0;
+            display: inline-block;
+        }
+
+        .toc-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .reference {
+            vertical-align: super;
+            font-size: smaller;
+            cursor: pointer;
+            color: #0645ad;
+        }
+
+        .reference:hover {
+            text-decoration: underline;
+        }
+
+        .infobox {
+            float: right;
+            margin: 0 0 1em 1em;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            background: #f8f9fa;
+            width: 22em;
+        }
+
+        .infobox-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .mw-references-wrap {
+            margin-top: 2em;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1em;
+        }
+
+        .reference-popup {
+            position: fixed;
+            max-width: 400px;
+            background: white;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            padding: 8px;
+            display: none;
+            z-index: 100;
+        }
+
+        .mw-editsection {
+            font-size: small;
+            margin-left: 8px;
+            color: #0645ad;
+            cursor: pointer;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            margin: 1em 0;
+        }
+
+        .gallery-item {
+            text-align: center;
+        }
+
+        .gallery-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        #tab-bar {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1em;
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-bottom: -1px;
+        }
+
+        .tab.active {
+            background: white;
+            border-color: var(--border-color);
+            border-bottom-color: white;
+        }
+
+        .section-collapsed .section-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="mw-head">
+        <div class="vector-menu">Read</div>
+        <div class="vector-menu">Edit</div>
+        <div class="vector-menu">View history</div>
+    </div>
+    <div id="mw-panel">
+        <div id="site-navigation">
+            <div class="vector-menu-heading">Navigation</div>
+            <ul>
+                <li>Main page</li>
+                <li>Contents</li>
+                <li>Current events</li>
+                <li>Random article</li>
+                <li>About Wikipedia</li>
+                <li>Contact us</li>
+                <li>Donate</li>
+            </ul>
+        </div>
+    </div>
+    <div id="content" class="mw-body">
+        <h1>Album cover</h1>
+        <div id="tab-bar">
+            <span class="tab active" data-tab="read">Read</span>
+            <span class="tab" data-tab="edit">Edit</span>
+            <span class="tab" data-tab="view-history">View history</span>
+        </div>
+        <div class="infobox">
+            <div class="infobox-header">Album cover</div>
+            <div class="infobox-content">
+                <p><strong>Industry:</strong> Music industry</p>
+                <p><strong>Main types:</strong></p>
+                <ul>
+                    <li>LP/album covers</li>
+                    <li>Digital album art</li>
+                    <li>CD booklets</li>
+                </ul>
+                <p><strong>Related topics:</strong></p>
+                <ul>
+                    <li>Graphic design</li>
+                    <li>Photography</li>
+                    <li>Typography</li>
+                </ul>
+            </div>
+        </div>
+        <div class="toc" id="toc">
+            <div class="toc-title">Contents</div>
+            <ul>
+                <li>1. <a href="#history">History</a></li>
+                <li>2. <a href="#design">Design elements</a>
+                    <ul>
+                        <li>2.1 Typography</li>
+                        <li>2.2 Color theory</li>
+                        <li>2.3 Imagery</li>
+                    </ul>
+                </li>
+                <li>3. <a href="#notable">Notable examples</a></li>
+                <li>4. <a href="#digital">Digital era</a></li>
+                <li>5. <a href="#references">References</a></li>
+            </ul>
+        </div>
+        <div class="section" id="history">
+            <h2>History<span class="mw-editsection">[edit]</span></h2>
+            <div class="section-content">
+                <p>An album cover is the front of the packaging of a commercially released audio recording product, or album. The term can refer to either the printed cardboard covers typically used to package sets of 10 inch and 12 inch 78-rpm records, or the front-facing panel of a modern CD package, or the front-facing panel of an LP vinyl record.<sup class="reference">1</sup></p>
+                <p>Album covers originally were plain brown paper wrappers. In 1938, Columbia Records hired Alex Steinweiss as its first art director. He is credited with inventing the concept of album covers and cover art<sup class="reference">2</sup>, replacing the plain covers used before.</p>
+            </div>
+        </div>
+        <div class="section" id="design">
+            <h2>Design elements<span class="mw-editsection">[edit]</span></h2>
+            <div class="section-content">
+                <p>Album cover design incorporates a variety of artistic elements and principles<sup class="reference">3</sup>:</p>
+                <div class="gallery">
+                    <div class="gallery-item">
+                        <div class="gallery-image">Typography Example</div>
+                        <div class="caption">Classic type design</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-image">Color Theory</div>
+                        <div class="caption">Color schemes</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-image">Photography</div>
+                        <div class="caption">Photo composition</div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="gallery-image">Illustration</div>
+                        <div class="caption">Hand-drawn art</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="reference-popup" id="reference-popup"></div>
+    </div>
+    <script>
+        // URL parameters for configuration
+        const params = new URLSearchParams(window.location.search);
+        const NUM_SECTIONS = parseInt(params.get('numSections')) || 4;
+        const NUM_REFERENCES = parseInt(params.get('numReferences')) || 20;
+        const GALLERY_SIZE = parseInt(params.get('gallerySize')) || 12;
+        
+        // Seeded random number generator
+        class Random {
+            constructor(seed = 1) {
+                this.seed = seed;
+            }
+            next() {
+                this.seed = (this.seed * 16807) % 2147483647;
+                return this.seed / 2147483647;
+            }
+        }
+        
+        const rng = new Random(42);
+
+        // Generate reference content
+        const references = Array.from({length: NUM_REFERENCES}, (_, i) => ({
+            id: `ref${i + 1}`,
+            text: `Reference ${i + 1}: Author ${String.fromCharCode(65 + (i % 26))}, Publication ${Math.floor(i/26) + 1}`
+        }));
+
+        // Handle reference clicks
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('reference')) {
+                const popup = document.getElementById('reference-popup');
+                const ref = references[parseInt(e.target.textContent) - 1];
+                popup.textContent = ref.text;
+                popup.style.display = 'block';
+                popup.style.left = `${Math.min(e.pageX, window.innerWidth - 420)}px`;
+                popup.style.top = `${e.pageY + 20}px`;
+            } else {
+                document.getElementById('reference-popup').style.display = 'none';
+            }
+        });
+
+        // Handle tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Handle section collapse/expand
+        document.querySelectorAll('.section').forEach(section => {
+            const heading = section.querySelector('h2');
+            heading.addEventListener('click', () => {
+                section.classList.toggle('section-collapsed');
+            });
+        });
+
+        // Handle keyboard shortcuts for tests
+        document.addEventListener('keydown', e => {
+            if (e.shiftKey && e.keyCode >= 49 && e.keyCode <= 57) {
+                const testIndex = e.keyCode - 49;
+                if (TESTS[testIndex]) {
+                    TESTS[testIndex].test();
+                }
+            }
+        });
+
+        // Define test scenarios
+        window.TESTS = [
+            {
+                name: "ExpandCollapseSections",
+                test: () => {
+                    const sections = document.querySelectorAll('.section');
+                    sections.forEach(section => {
+                        section.classList.add('section-collapsed');
+                        section.querySelector('h2').click();
+                    });
+                }
+            },
+            {
+                name: "ReferencePopups",
+                test: () => {
+                    const refs = document.querySelectorAll('.reference');
+                    refs.forEach(ref => {
+                        const rect = ref.getBoundingClientRect();
+                        const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            clientX: rect.left,
+                            clientY: rect.top
+                        });
+                        ref.dispatchEvent(clickEvent);
+                    });
+                }
+            },
+            {
+                name: "TabSwitching",
+                test: () => {
+                    const tabs = document.querySelectorAll('.tab');
+                    tabs.forEach(tab => tab.click());
+                }
+            },
+            {
+                name: "ScrollTOC",
+                test: () => {
+                    const tocLinks = document.querySelectorAll('.toc a');
+                    tocLinks.forEach(link => {
+                        const targetId = link.getAttribute('href').substring(1);
+                        const target = document.getElementById(targetId);
+                        target.scrollIntoView();
+                    });
+                }
+            }
+        ];
+    </script>
+</body>
+<script type="module" src="/runner-adapter.js"></script>
+</html>
