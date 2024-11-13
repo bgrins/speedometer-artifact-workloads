@@ -74,5 +74,9 @@
   {
     "name": "video-2",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/video-2//"
+  },
+  {
+    "name": "wiki-1",
+    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/wiki-1//"
   }
 ]
