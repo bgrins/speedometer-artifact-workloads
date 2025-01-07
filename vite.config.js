@@ -30,7 +30,9 @@ function processVanillaWorkloads(staticPages, links) {
     fs.copyFileSync(resolve(vanillaDir, page), resolve(workloadsDir, page));
 
     const pageName = page.replace(".html", "");
-    links.push([pageName, `${pageName}/`]);
+    links.push([pageName, `${pageName}/`, {
+      hasTestsObject: html.includes("window.TESTS"),
+    }]);
   });
 }
 
@@ -48,7 +50,9 @@ function createHTMLFilesForArtifacts() {
     const newHTML = template.replace("../src/artifacts/template", `../src/artifacts/${componentName}`);
 
     fs.writeFileSync(resolve(__dirname, `workloads/${componentName}.html`), newHTML);
-    links.push([componentName, `${componentName}/`]);
+    links.push([componentName, `${componentName}/`, {
+      hasTestsObject: fs.readFileSync(resolve(__dirname, "src/artifacts/" + component)).includes("window.TESTS"),
+    }]);
   });
 
   // Clean up obsolete workload files
@@ -67,7 +71,9 @@ function createHTMLFilesForArtifacts() {
   processVanillaWorkloads(staticPages, links);
 
   // Generate remote workloads config
-  const remoteWorkloads = links.sort().map(([name, path]) => ({
+  const remoteWorkloads = links.sort().filter(([name, path, { hasTestsObject }]) => {
+    return hasTestsObject;
+  }).map(([name, path]) => ({
     name,
     url: `https://speedometer-artifact-workloads.pages.dev/workloads/${path}`,
   }));

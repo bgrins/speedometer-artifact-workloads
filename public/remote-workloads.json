@@ -1,19 +1,11 @@
 [
   {
-    "name": "data-dashboard-1",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/data-dashboard-1/"
-  },
-  {
     "name": "edu-1",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/edu-1/"
   },
   {
     "name": "edu-2",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/edu-2/"
-  },
-  {
-    "name": "email-1",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/email-1/"
   },
   {
     "name": "finance-1",
@@ -24,10 +16,6 @@
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/finance-2/"
   },
   {
-    "name": "finance-3",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/finance-3/"
-  },
-  {
     "name": "items-1",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/items-1/"
   },
@@ -36,32 +24,12 @@
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/items-2/"
   },
   {
-    "name": "login-form",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/login-form/"
-  },
-  {
-    "name": "multi-touch-1",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/multi-touch-1/"
-  },
-  {
-    "name": "multi-touch-2",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/multi-touch-2/"
-  },
-  {
     "name": "pinterest-inspired",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/pinterest-inspired/"
   },
   {
-    "name": "project-management-1",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/project-management-1/"
-  },
-  {
     "name": "search-1",
     "url": "https://speedometer-artifact-workloads.pages.dev/workloads/search-1/"
-  },
-  {
-    "name": "simple-spreadsheet",
-    "url": "https://speedometer-artifact-workloads.pages.dev/workloads/simple-spreadsheet/"
   },
   {
     "name": "social-1",
