@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Platform</title>
+<style>
+:root {
+  --header-height: 56px;
+  --sidebar-width: 240px;
+  --text-color: #0f0f0f;
+  --bg-color: #fff;
+  --hover-color: #f2f2f2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--bg-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.menu-btn {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.menu-btn:hover {
+  background: var(--hover-color);
+}
+
+.logo {
+  margin-left: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.search-box {
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px 0 0 20px;
+  font-size: 16px;
+}
+
+.search-btn {
+  padding: 8px 24px;
+  background: var(--hover-color);
+  border: 1px solid #ccc;
+  border-left: none;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
+}
+
+.sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--bg-color);
+  overflow-y: auto;
+  transition: transform 0.2s;
+  z-index: 99;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+.nav-item {
+  padding: 12px 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-item:hover {
+  background: var(--hover-color);
+}
+
+.main-content {
+  margin-top: var(--header-height);
+  margin-left: var(--sidebar-width);
+  padding: 24px;
+  transition: margin-left 0.2s;
+}
+
+.main-content.full {
+  margin-left: 0;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.filter-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: var(--bg-color);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-btn.active {
+  background: var(--text-color);
+  color: var(--bg-color);
+  border-color: var(--text-color);
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.video-card {
+  cursor: pointer;
+}
+
+.thumbnail {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #f0f0f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.video-info {
+  display: flex;
+  gap: 12px;
+}
+
+.channel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  flex-shrink: 0;
+}
+
+.video-details h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.channel-name, .video-meta {
+  font-size: 14px;
+  color: #606060;
+}
+
+.loading {
+  text-align: center;
+  padding: 24px;
+  color: #606060;
+}
+
+@media (max-width: 768px) {
+  .video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  
+  .sidebar {
+    width: 100%;
+    background: rgba(255,255,255,0.95);
+  }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="menu-btn">☰</div>
+  <div class="logo">VideoPlatform</div>
+  <div class="search-container">
+    <input type="text" class="search-box" placeholder="Search">
+    <button class="search-btn">🔍</button>
+  </div>
+</header>
+
+<nav class="sidebar">
+  <div class="nav-item">Home</div>
+  <div class="nav-item">Trending</div>
+  <div class="nav-item">Subscriptions</div>
+  <div class="nav-item">Library</div>
+  <div class="nav-item">History</div>
+  <div class="nav-item">Watch Later</div>
+  <div class="nav-item">Liked Videos</div>
+  <div class="nav-item">Music</div>
+  <div class="nav-item">Gaming</div>
+  <div class="nav-item">Sports</div>
+  <div class="nav-item">News</div>
+  <div class="nav-item">Learning</div>
+  <div class="nav-item">Fashion</div>
+</nav>
+
+<main class="main-content">
+  <div class="filters"></div>
+  <div class="video-grid"></div>
+  <div class="loading">Loading more videos...</div>
+</main>
+
+<script>
+const NUM_INITIAL_VIDEOS = parseInt(new URLSearchParams(window.location.search).get('numVideos')) || 24;
+const NUM_LOAD_MORE = parseInt(new URLSearchParams(window.location.search).get('loadMore')) || 12;
+const CATEGORIES = ['All', 'Music', 'Gaming', 'News', 'Live', 'Sports', 'Learning', 'Fashion', 'Beauty', 'Science', 'Technology', 'Entertainment', 'Comedy', 'Vlogs'];
+
+class Random {
+  constructor(seed = 1) {
+    this.seed = seed;
+  }
+  
+  next() {
+    this.seed = (this.seed * 16807) % 2147483647;
+    return this.seed / 2147483647;
+  }
+}
+
+const rng = new Random(42);
+
+const generateTitle = () => {
+  const words = ['Amazing', 'Ultimate', 'How to', 'Why', 'Top 10', 'Best', 'Review', 'Tutorial', 'Guide', 'Complete'];
+  const topics = ['Video', 'Challenge', 'Reaction', 'Gameplay', 'Tips', 'Tricks', 'Secrets', 'Facts', 'Story', 'Journey'];
+  return `${words[Math.floor(rng.next() * words.length)]} ${topics[Math.floor(rng.next() * topics.length)]} ${Math.floor(rng.next() * 2024)}`;
+}
+
+const generateVideos = (count) => {
+  return Array(count).fill().map(() => ({
+    id: Math.floor(rng.next() * 1000000),
+    title: generateTitle(),
+    channel: `Channel ${Math.floor(rng.next() * 1000)}`,
+    views: `${Math.floor(rng.next() * 1000)}K views`,
+    duration: `${Math.floor(rng.next() * 10 + 1)}:${String(Math.floor(rng.next() * 60)).padStart(2, '0')}`,
+    category: CATEGORIES[Math.floor(rng.next() * CATEGORIES.length)]
+  }));
+}
+
+let videos = generateVideos(NUM_INITIAL_VIDEOS);
+let activeFilter = 'All';
+let sidebarVisible = true;
+
+const createVideoCard = (video) => {
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML = `
+    <div class="thumbnail">
+      <div class="duration">${video.duration}</div>
+    </div>
+    <div class="video-info">
+      <div class="channel-icon"></div>
+      <div class="video-details">
+        <h3>${video.title}</h3>
+        <div class="channel-name">${video.channel}</div>
+        <div class="video-meta">${video.views} • ${Math.floor(rng.next() * 12 + 1)} months ago</div>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+const renderVideos = () => {
+  const grid = document.querySelector('.video-grid');
+  grid.innerHTML = '';
+  
+  const filtered = activeFilter === 'All' 
+    ? videos 
+    : videos.filter(v => v.category === activeFilter);
+    
+  filtered.forEach(video => {
+    grid.appendChild(createVideoCard(video));
+  });
+}
+
+const renderFilters = () => {
+  const filters = document.querySelector('.filters');
+  CATEGORIES.forEach(category => {
+    const btn = document.createElement('button');
+    btn.className = `filter-btn ${category === activeFilter ? 'active' : ''}`;
+    btn.textContent = category;
+    btn.onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = category;
+      renderVideos();
+    };
+    filters.appendChild(btn);
+  });
+}
+
+const toggleSidebar = () => {
+  sidebarVisible = !sidebarVisible;
+  document.querySelector('.sidebar').classList.toggle('collapsed');
+  document.querySelector('.main-content').classList.toggle('full');
+}
+
+const loadMore = () => {
+  const newVideos = generateVideos(NUM_LOAD_MORE);
+  videos = [...videos, ...newVideos];
+  renderVideos();
+}
+
+const setupInfiniteScroll = () => {
+  window.onscroll = () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
+      loadMore();
+    }
+  };
+}
+
+document.querySelector('.menu-btn').onclick = toggleSidebar;
+document.querySelector('.search-box').oninput = (e) => {
+  const query = e.target.value.toLowerCase();
+  videos = generateVideos(NUM_INITIAL_VIDEOS).filter(v => 
+    v.title.toLowerCase().includes(query) || 
+    v.channel.toLowerCase().includes(query)
+  );
+  renderVideos();
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.shiftKey) {
+    switch (e.keyCode) {
+      case 49: // 1
+        toggleSidebar();
+        break;
+      case 50: // 2
+        loadMore();
+        break;
+      case 51: // 3
+        CATEGORIES.forEach((cat, i) => {
+          setTimeout(() => {
+            activeFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(b => 
+              b.classList.toggle('active', b.textContent === cat)
+            );
+            renderVideos();
+          }, i * 100);
+        });
+        break;
+      case 52: // 4
+        const searchTerms = ['gaming', 'music', 'news', 'tech'];
+        searchTerms.forEach((term, i) => {
+          setTimeout(() => {
+            document.querySelector('.search-box').value = term;
+            document.querySelector('.search-box').dispatchEvent(new Event('input'));
+          }, i * 500);
+        });
+        break;
+    }
+  }
+});
+
+window.TESTS = [
+  {
+    name: 'ToggleSidebar',
+    test: () => {
+      for (let i = 0; i < 5; i++) {
+        toggleSidebar();
+      }
+    }
+  },
+  {
+    name: 'LoadMoreContent',
+    test: () => {
+      for (let i = 0; i < 3; i++) {
+        loadMore();
+      }
+    }
+  },
+  {
+    name: 'FilterCategories',
+    test: () => {
+      CATEGORIES.forEach(cat => {
+        activeFilter = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => 
+          b.classList.toggle('active', b.textContent === cat)
+        );
+        renderVideos();
+      });
+    }
+  },
+  {
+    name: 'SearchAndFilter',
+    test: () => {
+      const searchTerms = ['gaming', 'music', 'news', 'tech'];
+      searchTerms.forEach(term => {
+        document.querySelector('.search-box').value = term;
+        document.querySelector('.search-box').dispatchEvent(new Event('input'));
+      });
+    }
+  }
+];
+
+renderFilters();
+renderVideos();
+setupInfiniteScroll();
+</script>
+</body>
+<script type="module" src="/runner-adapter.js"></script>
+<script type="module" src="/src/lib/speedometer-connector.js"></script>
+</html>

@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
+import { FileX } from "lucide-react";
 
 function createHTMLFilesForArtifacts() {
   const artifactsDir = resolve(__dirname, "src/artifacts");
@@ -47,7 +48,7 @@ function createHTMLFilesForArtifacts() {
     }
   }
 
-  const staticPages = fs.readdirSync(resolve(__dirname, "public/workloads"));
+  const staticPages = fs.readdirSync(resolve(__dirname, "vanilla-workloads"));
   let links = [];
   const remoteWorkloads = [];
 
@@ -63,27 +64,34 @@ function createHTMLFilesForArtifacts() {
 
   for (const page of staticPages) {
     if (path.extname(page) === ".html") {
-
-			if (!fs.readFileSync(resolve(__dirname, `public/workloads/${page}`), "utf-8").includes("runner-adapter.js")) {
-				const html = fs.readFileSync(resolve(__dirname, `public/workloads/${page}`), "utf-8");
-				const script = `<script type="module" src="/runner-adapter.js"></script>`;
-				const newHTML = html.replace("</html>", `${script}
+      if (!fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8").includes("runner-adapter.js")) {
+        const html = fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8");
+        const script = `<script type="module" src="/runner-adapter.js"></script>`;
+        const newHTML = html.replace("</html>", `${script}
 </html>`);
-				fs.writeFileSync(resolve(__dirname, `public/workloads/${page}`), newHTML);
-			}
-			
+        fs.writeFileSync(resolve(__dirname, `vanilla-workloads/${page}`), newHTML);
+      }
+      if (!fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8").includes("speedometer-connector.js")) {
+        const html = fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8");
+        const script = `<script type="module" src="/src/lib/speedometer-connector.js"></script>`;
+        const newHTML = html.replace("</html>", `${script}
+</html>`);
+        fs.writeFileSync(resolve(__dirname, `vanilla-workloads/${page}`), newHTML);
+      }
+      
+      fs.copyFileSync(resolve(__dirname, `vanilla-workloads/${page}`), resolve(__dirname, `workloads/${page}`));
 
       const pageName = page.replace(".html", "");
-      links.push([pageName, page]);
+      links.push([pageName, `${pageName}/`]);
     }
   }
 
-	links = links.sort();
+  links = links.sort();
 
   for (const link of links) {
     remoteWorkloads.push({
       name: link[0],
-      url: `https://speedometer-artifact-workloads.pages.dev/workloads/${link[1]}/`,
+      url: `https://speedometer-artifact-workloads.pages.dev/workloads/${link[1]}`,
     });
   }
   fs.writeFileSync(
@@ -116,13 +124,18 @@ function getHtmlInputs() {
   const pagesDir = resolve(__dirname, "workloads");
   const pages = fs.readdirSync(pagesDir);
 
-  return pages.reduce((inputs, page) => {
+  let inputs = pages.reduce((inputs, page) => {
     if (path.extname(page) === ".html") {
       const pageName = page.replace(".html", "");
       inputs[pageName] = resolve(pagesDir, page);
     }
     return inputs;
   }, {});
+
+  console.log(inputs);
+  return inputs;
+  
+
 }
 
 export default defineConfig({
@@ -159,10 +172,22 @@ export default defineConfig({
       input: {
         index: fileURLToPath(new URL("./index.html", import.meta.url)),
         ...getHtmlInputs(),
+        speedometerConnector: fileURLToPath(new URL("./src/lib/speedometer-connector.js", import.meta.url)),
       },
       output: {
         assetFileNames: "[name]/[name].[ext]",
+        // entryFileNames: (chunkInfo) => {
+        //   // Check if the file is the specific one you want to keep original
+        //   console.log(chunkInfo.name);
+        //   if (chunkInfo.name === 'speedometerConnector') {
+        //     return '../public/speedometer-connector.js'; // Keep original name
+        //   }
+        //   return '[name].[hash].js'; 
+        // },
         manualChunks(id) {
+          if (id.includes("Speedometer")) { 
+            return "speedometer";
+          }
           if (id.includes("node_modules")) {
             return "vendor";
           }

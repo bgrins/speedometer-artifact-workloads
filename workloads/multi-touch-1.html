@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Touch Debugger</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --primary-color: #2563eb;
+      --accent-color: #3b82f6;
+      --background-color: #f8fafc;
+      --card-background: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #3b82f6;
+        --accent-color: #60a5fa;
+        --background-color: #0f172a;
+        --card-background: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+      }
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      touch-action: none;
+      user-select: none;
+      background-color: var(--background-color);
+      color: var(--text-primary);
+    }
+
+    .container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: calc(0.5rem + var(--safe-area-top)) 0.5rem calc(0.5rem + var(--safe-area-bottom));
+    }
+
+    .info-card {
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 0 0.5rem 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .info-card.collapsed {
+      transform: translateY(-90%);
+    }
+
+    .info-card .handle {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .debug-area {
+      position: relative;
+      flex-grow: 1;
+      background: var(--background-color);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 0.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      gap: 0.5rem;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .touch-point {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .touch-outer {
+      position: absolute;
+      inset: 0;
+      border: 3px solid;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .touch-inner {
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    .touch-data {
+      position: absolute;
+      background: var(--card-background);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      pointer-events: none;
+      white-space: pre;
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
+    }
+
+    .touch-trail {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.5;
+      transition: opacity 1s;
+    }
+
+    .touch-trail.fade {
+      opacity: 0;
+    }
+
+    .settings {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .toggle {
+      padding: 0.5rem;
+      border-radius: 6px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .toggle:hover {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .toggle.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    @keyframes ping {
+      75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .touch-point {
+        width: 60px;
+        height: 60px;
+      }
+
+      .touch-inner {
+        inset: 15px;
+      }
+
+      .touch-data {
+        font-size: 10px;
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="info-card">
+      <h1 class="title">Touch Debugger</h1>
+      <p class="subtitle">Interactive multi-touch visualization and debugging tool</p>
+      <div class="stats">
+        <div class="stat">
+          <span>Touches:</span>
+          <span id="touch-count" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span>Event:</span>
+          <span id="last-event" class="stat-value">None</span>
+        </div>
+      </div>
+      <div class="handle" id="card-handle"></div>
+    </div>
+    
+    <div id="debug-area" class="debug-area">
+      <div class="empty-state">
+        <div>Touch anywhere to begin debugging</div>
+        <div style="font-size: 0.875rem">All touch events and properties will be visualized here</div>
+      </div>
+      <div class="settings">
+        <button id="toggle-trails" class="toggle">
+          Trails
+        </button>
+        <button id="toggle-data" class="toggle active">
+          Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const debugArea = document.getElementById('debug-area');
+    const touchCount = document.getElementById('touch-count');
+    const lastEvent = document.getElementById('last-event');
+    const infoCard = document.querySelector('.info-card');
+    const cardHandle = document.getElementById('card-handle');
+    const toggleTrails = document.getElementById('toggle-trails');
+    const toggleData = document.getElementById('toggle-data');
+    
+    const touchPoints = new Map();
+    const settings = {
+      showTrails: false,
+      showData: true
+    };
+    
+    const colors = [
+      '#ef4444', // red
+      '#3b82f6', // blue
+      '#22c55e', // green
+      '#a855f7', // purple
+      '#f97316'  // orange
+    ];
+    
+    const getColor = (index) => colors[index % colors.length];
+    
+    // Prevent default touch behaviors
+    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+    
+    // Toggle card collapse
+    cardHandle.addEventListener('click', () => {
+      infoCard.classList.toggle('collapsed');
+    });
+
+    // Toggle settings
+    toggleTrails.addEventListener('click', () => {
+      settings.showTrails = !settings.showTrails;
+      toggleTrails.classList.toggle('active');
+    });
+
+    toggleData.addEventListener('click', () => {
+      settings.showData = !settings.showData;
+      toggleData.classList.toggle('active');
+      document.querySelectorAll('.touch-data').forEach(el => {
+        el.style.display = settings.showData ? 'block' : 'none';
+      });
+    });
+    
+    function createTouchPoint(touch, color) {
+      const point = document.createElement('div');
+      point.className = 'touch-point';
+      
+      const outer = document.createElement('div');
+      outer.className = 'touch-outer';
+      outer.style.borderColor = color;
+      
+      const inner = document.createElement('div');
+      inner.className = 'touch-inner';
+      inner.style.backgroundColor = color;
+      
+      const data = document.createElement('div');
+      data.className = 'touch-data';
+      data.style.color = color;
+      data.style.display = settings.showData ? 'block' : 'none';
+      
+      point.appendChild(outer);
+      point.appendChild(inner);
+      point.appendChild(data);
+      
+      return { 
+        element: point, 
+        data,
+        lastX: null,
+        lastY: null,
+        trails: []
+      };
+    }
+    
+    function createTrailPoint(x, y, color) {
+      const trail = document.createElement('div');
+      trail.className = 'touch-trail';
+      trail.style.backgroundColor = color;
+      trail.style.left = `${x}px`;
+      trail.style.top = `${y}px`;
+      return trail;
+    }
+    
+    function updateTouchPoint(touch, point) {
+      const rect = debugArea.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      
+      point.element.style.left = `${x}px`;
+      point.element.style.top = `${y}px`;
+      
+      // Position data box based on screen quadrant to avoid clipping
+      const isRight = x > rect.width / 2;
+      const isBottom = y > rect.height / 2;
+      point.data.style.left = `${x + (isRight ? -120 : 40)}px`;
+      point.data.style.top = `${y + (isBottom ? -120 : 40)}px`;
+      
+      // Update touch data
+      const pressure = touch.force || (touch.webkitForce !== undefined ? touch.webkitForce / 3 : null);
+      point.data.textContent = 
+        `ID: ${touch.identifier}\n` +
+        `Force: ${pressure?.toFixed(3) || 'N/A'}\n` +
+        `Radius: ${touch.radiusX?.toFixed(1) || 'N/A'}×${touch.radiusY?.toFixed(1) || 'N/A'}\n` +
+        `Rotation: ${touch.rotationAngle?.toFixed(1) || 'N/A'}°\n` +
+        `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
+
+      // Add trail point if enabled and moved
+      if (settings.showTrails && point.lastX !== null) {
+        const distance = Math.hypot(x - point.lastX, y - point.lastY);
+        if (distance > 10) { // Only add trail point if moved more than 10px
+          const trail = createTrailPoint(x, y, colors[parseInt(touch.identifier) % colors.length]);
+          debugArea.appendChild(trail);
+          point.trails.push(trail);
+          
+          // Start fade out
+          requestAnimationFrame(() => {
+            trail.classList.add('fade');
+          });
+
+          // Remove after animation
+          setTimeout(() => {
+            trail.remove();
+            point.trails = point.trails.filter(t => t !== trail);
+          }, 1000);
+
+          point.lastX = x;
+          point.lastY = y;
+        }
+      } else {
+        point.lastX = x;
+        point.lastY = y;
+      }
+    }
+    
+    function processTouch(e, eventType) {
+      e.preventDefault();
+      lastEvent.textContent = eventType;
+      
+      // Remove points that are no longer touched
+      for (const [id, point] of touchPoints) {
+        if (![...e.touches].some(touch => touch.identifier === id)) {
+          point.element.remove();
+          point.trails.forEach(trail => trail.remove());
+          touchPoints.delete(id);
+        }
+      }
+      
+      // Update or create points for current touches
+      Array.from(e.touches).forEach((touch, index) => {
+        let point = touchPoints.get(touch.identifier);
+        
+        if (!point) {
+          point = createTouchPoint(touch, getColor(index));
+          debugArea.appendChild(point.element);
+          touchPoints.set(touch.identifier, point);
+        }
+        
+        updateTouchPoint(touch, point);
+      });
+      
+      touchCount.textContent = touchPoints.size;
+    }
+    
+    debugArea.addEventListener('touchstart', e => processTouch(e, 'touchstart'), { passive: false });
+    debugArea.addEventListener('touchmove', e => processTouch(e, 'touchmove'), { passive: false });
+    debugArea.addEventListener('touchend', e => processTouch(e, 'touchend'), { passive: false });
+    debugArea.addEventListener('touchcancel', e => processTouch(e, 'touchcancel'), { passive: false });
+  </script>
+</body>
+<script type="module" src="/runner-adapter.js"></script>
+<script type="module" src="/src/lib/speedometer-connector.js"></script>
+</html>
