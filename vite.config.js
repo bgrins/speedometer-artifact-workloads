@@ -4,139 +4,102 @@ import path from "path";
 import fs from "fs";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
-import { FileX } from "lucide-react";
+
+function injectScriptToHTML(htmlContent, scriptSrc) {
+  const script = `<script type="module" src="${scriptSrc}"></script>`;
+  return htmlContent.replace("</html>", `${script}\n</html>`);
+}
+
+function processVanillaWorkloads(staticPages, links) {
+  const vanillaDir = resolve(__dirname, "vanilla-workloads");
+  const workloadsDir = resolve(__dirname, "workloads");
+
+  staticPages.forEach(page => {
+    if (path.extname(page) !== ".html") return;
+
+    let html = fs.readFileSync(resolve(vanillaDir, page), "utf-8");
+
+    if (!html.includes("runner-adapter.js")) {
+      html = injectScriptToHTML(html, "/runner-adapter.js");
+    }
+    if (!html.includes("speedometer-connector.js")) {
+      html = injectScriptToHTML(html, "/src/lib/speedometer-connector.js");
+    }
+
+    fs.writeFileSync(resolve(vanillaDir, page), html);
+    fs.copyFileSync(resolve(vanillaDir, page), resolve(workloadsDir, page));
+
+    const pageName = page.replace(".html", "");
+    links.push([pageName, `${pageName}/`]);
+  });
+}
 
 function createHTMLFilesForArtifacts() {
   const artifactsDir = resolve(__dirname, "src/artifacts");
   const artifacts = fs.readdirSync(artifactsDir);
+  const links = [];
 
-  // Create a new HTML file for each component based on the template.
-  // This way, the author only needs to add a single file in src/artifacts
-  for (const component of artifacts) {
-    if (
-      path.extname(component) === ".tsx" ||
-      path.extname(component) === ".jsx"
-    ) {
-      const componentName = component.replace(".tsx", "").replace(".jsx", "");
-      const template = fs.readFileSync(
-        resolve(__dirname, "workload-template/template.html"),
-        "utf-8"
-      );
-      const newHTML = template.replace(
-        "../src/artifacts/template",
-        `../src/artifacts/${componentName}`
-      );
-      fs.writeFileSync(
-        resolve(__dirname, `workloads/${componentName}.html`),
-        newHTML
-      );
-    }
-  }
+  // Create HTML files for React components
+  artifacts.forEach(component => {
+    if (![".tsx", ".jsx"].includes(path.extname(component))) return;
 
-  // remove anything left in workloads/ that isn't in artifacts
-  const pagesDir = resolve(__dirname, "workloads");
-  const pages = fs.readdirSync(pagesDir);
-  for (const page of pages) {
-    if (path.extname(page) === ".html") {
+    const componentName = path.basename(component, path.extname(component));
+    const template = fs.readFileSync(resolve(__dirname, "workload-template/template.html"), "utf-8");
+    const newHTML = template.replace("../src/artifacts/template", `../src/artifacts/${componentName}`);
+
+    fs.writeFileSync(resolve(__dirname, `workloads/${componentName}.html`), newHTML);
+    links.push([componentName, `${componentName}/`]);
+  });
+
+  // Clean up obsolete workload files
+  const workloadsDir = resolve(__dirname, "workloads");
+  fs.readdirSync(workloadsDir)
+    .filter(page => path.extname(page) === ".html")
+    .forEach(page => {
       const pageName = page.replace(".html", "");
-      if (
-        !artifacts.includes(`${pageName}.tsx`) &&
-        !artifacts.includes(`${pageName}.jsx`)
-      ) {
-        fs.unlinkSync(resolve(__dirname, `workloads/${page}`));
+      if (!artifacts.some(a => a.startsWith(pageName))) {
+        fs.unlinkSync(resolve(workloadsDir, page));
       }
-    }
-  }
-
-  const staticPages = fs.readdirSync(resolve(__dirname, "vanilla-workloads"));
-  let links = [];
-  const remoteWorkloads = [];
-
-  for (const component of artifacts) {
-    if (
-      path.extname(component) === ".tsx" ||
-      path.extname(component) === ".jsx"
-    ) {
-      const componentName = path.basename(component, path.extname(component));
-      links.push([componentName, `${componentName}/`]);
-    }
-  }
-
-  for (const page of staticPages) {
-    if (path.extname(page) === ".html") {
-      if (!fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8").includes("runner-adapter.js")) {
-        const html = fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8");
-        const script = `<script type="module" src="/runner-adapter.js"></script>`;
-        const newHTML = html.replace("</html>", `${script}
-</html>`);
-        fs.writeFileSync(resolve(__dirname, `vanilla-workloads/${page}`), newHTML);
-      }
-      if (!fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8").includes("speedometer-connector.js")) {
-        const html = fs.readFileSync(resolve(__dirname, `vanilla-workloads/${page}`), "utf-8");
-        const script = `<script type="module" src="/src/lib/speedometer-connector.js"></script>`;
-        const newHTML = html.replace("</html>", `${script}
-</html>`);
-        fs.writeFileSync(resolve(__dirname, `vanilla-workloads/${page}`), newHTML);
-      }
-      
-      fs.copyFileSync(resolve(__dirname, `vanilla-workloads/${page}`), resolve(__dirname, `workloads/${page}`));
-
-      const pageName = page.replace(".html", "");
-      links.push([pageName, `${pageName}/`]);
-    }
-  }
-
-  links = links.sort();
-
-  for (const link of links) {
-    remoteWorkloads.push({
-      name: link[0],
-      url: `https://speedometer-artifact-workloads.pages.dev/workloads/${link[1]}`,
     });
-  }
+
+  // Process vanilla workloads
+  const staticPages = fs.readdirSync(resolve(__dirname, "vanilla-workloads"));
+  processVanillaWorkloads(staticPages, links);
+
+  // Generate remote workloads config
+  const remoteWorkloads = links.sort().map(([name, path]) => ({
+    name,
+    url: `https://speedometer-artifact-workloads.pages.dev/workloads/${path}`,
+  }));
   fs.writeFileSync(
     resolve(__dirname, "public/remote-workloads.json"),
     JSON.stringify(remoteWorkloads, null, 2)
   );
 
-  // Update index.html with a listing
-  const html = fs.readFileSync(resolve(__dirname, "index.html"), "utf-8");
-  const ulStart = html.indexOf("<!-- workload listing -->");
-  const ulEnd = html.indexOf("<!-- end workload listing -->");
-  const ul = html.substring(
-    ulStart + "<!-- workload listing -->".length,
-    ulEnd
+  // Update index.html
+  const indexPath = resolve(__dirname, "index.html");
+  const html = fs.readFileSync(indexPath, "utf-8");
+  const listingContent = `\n<ul>\n${links.sort().map(([name, path]) =>
+    `<li><a href="workloads/${path}">${name}</a></li>`).join("\n")}\n</ul>\n`;
+
+  const newHTML = html.replace(
+    /<!-- workload listing -->.*<!-- end workload listing -->/s,
+    `<!-- workload listing -->${listingContent}<!-- end workload listing -->`
   );
-  let newUl = "\n<ul>\n";
-  for (const link of links) {
-    newUl += `<li><a href="workloads/${link[1]}">${link[0]}</a></li>
-`;
-  }
-
-  newUl += "\n</ul>\n";
-  const newHTML = html.replace(ul, newUl);
-  fs.writeFileSync(resolve(__dirname, "index.html"), newHTML);
+  fs.writeFileSync(indexPath, newHTML);
 }
-
-createHTMLFilesForArtifacts();
 
 function getHtmlInputs() {
   const pagesDir = resolve(__dirname, "workloads");
-  const pages = fs.readdirSync(pagesDir);
-
-  let inputs = pages.reduce((inputs, page) => {
-    if (path.extname(page) === ".html") {
-      const pageName = page.replace(".html", "");
-      inputs[pageName] = resolve(pagesDir, page);
-    }
-    return inputs;
-  }, {});
-
-  console.log(inputs);
-  return inputs;
-  
-
+  return fs.readdirSync(pagesDir)
+    .filter(page => path.extname(page) === ".html")
+    .reduce((inputs, page) => {
+      inputs[page.replace(".html", "")] = resolve(pagesDir, page);
+      return inputs;
+    }, {});
 }
+
+createHTMLFilesForArtifacts();
 
 export default defineConfig({
   plugins: [
@@ -145,22 +108,13 @@ export default defineConfig({
       name: "html-transform",
       enforce: "post",
       generateBundle(options, bundle) {
-        // Rewrite workload/data-dashboard.html to dist/workload/data-dashboard/index.html
-        const htmlFiles = Object.keys(bundle).filter((name) =>
-          name.endsWith(".html")
-        );
-        htmlFiles.forEach((fileName) => {
-          const chunk = bundle[fileName];
-          const baseName = fileName.replace(".html", "");
-
-          if (baseName === "index") {
-            // Keep index.html at the root
-            chunk.fileName = "index.html";
-          } else {
-            // Move other HTML files to their own directories
-            chunk.fileName = `${baseName}/index.html`;
-          }
-        });
+        Object.keys(bundle)
+          .filter(name => name.endsWith(".html"))
+          .forEach(fileName => {
+            const chunk = bundle[fileName];
+            const baseName = fileName.replace(".html", "");
+            chunk.fileName = baseName === "index" ? "index.html" : `${baseName}/index.html`;
+          });
       },
     },
   ],
@@ -176,21 +130,9 @@ export default defineConfig({
       },
       output: {
         assetFileNames: "[name]/[name].[ext]",
-        // entryFileNames: (chunkInfo) => {
-        //   // Check if the file is the specific one you want to keep original
-        //   console.log(chunkInfo.name);
-        //   if (chunkInfo.name === 'speedometerConnector') {
-        //     return '../public/speedometer-connector.js'; // Keep original name
-        //   }
-        //   return '[name].[hash].js'; 
-        // },
         manualChunks(id) {
-          if (id.includes("Speedometer")) { 
-            return "speedometer";
-          }
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
+          if (id.includes("Speedometer")) return "speedometer";
+          if (id.includes("node_modules")) return "vendor";
         },
       },
     },
