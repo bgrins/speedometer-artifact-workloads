@@ -1,19 +1,19 @@
 
 import { BenchmarkStep, BenchmarkSuite } from "Speedometer/resources/shared/benchmark.mjs";
-import { forceLayout, getElement } from "Speedometer/resources/shared/helpers.mjs";
+import * as helpers from "Speedometer/resources/shared/helpers.mjs";
 import { BenchmarkConnector } from "Speedometer/resources/shared/workload-testing-utils.mjs";
 
 const suites = {};
 for (const test of (window.TESTS || [])) {
   suites[test.name] = new BenchmarkSuite(test.name, [
     new BenchmarkStep(test.name, () => {
-      test.test()
+      test.test(helpers)
     }),
   ]);
 }
 
 // https://speedometer-artifact-workloads.pages.dev/workloads/edu-1/ should be edu-1
-const name = window.location.pathname.split("/").pop();
+const name = window.location.pathname.replace(/\/$/, "").split("/").pop();
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log(suites, name);
