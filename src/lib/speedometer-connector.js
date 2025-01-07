@@ -1,7 +1,5 @@
-
-import { BenchmarkStep, BenchmarkSuite } from "Speedometer/resources/shared/benchmark.mjs";
 import * as helpers from "Speedometer/resources/shared/helpers.mjs";
-import { BenchmarkConnector } from "Speedometer/resources/shared/workload-testing-utils.mjs";
+import { BenchmarkStep, BenchmarkSuite, BenchmarkConnector } from "Speedometer/resources/shared/workload-testing-utils.mjs";
 
 const suites = {};
 for (const test of (window.TESTS || [])) {
